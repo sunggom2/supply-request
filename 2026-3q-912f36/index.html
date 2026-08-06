@@ -1,0 +1,400 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#151b34">
+<title>비품 신청 · 두드림원</title>
+<link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css">
+<style>
+:root{
+  --bg:#f2f4f8; --card:#fff; --fg:#141824; --muted:#707888; --line:#e5e8f0;
+  --primary:#2f5bea; --primary-ink:#fff; --primary-soft:#edf1ff; --primary-line:#c4d1ff;
+  --ok:#10b981; --shadow:0 1px 2px rgba(20,24,36,.05), 0 8px 24px rgba(20,24,36,.06);
+  --radius:16px;
+}
+@media (prefers-color-scheme:dark){
+  :root{
+    --bg:#0d0f16; --card:#161a24; --fg:#eef0f6; --muted:#949cae; --line:#262c3a;
+    --primary:#6486ff; --primary-ink:#0d0f16; --primary-soft:#1a2140; --primary-line:#31406e;
+    --shadow:0 1px 2px rgba(0,0,0,.3), 0 8px 24px rgba(0,0,0,.35);
+  }
+}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{margin:0;padding:0}
+body{
+  background:var(--bg); color:var(--fg);
+  font-family:"Pretendard Variable",Pretendard,-apple-system,BlinkMacSystemFont,"Apple SD Gothic Neo","Malgun Gothic",system-ui,sans-serif;
+  font-size:16px; line-height:1.5; letter-spacing:-.01em;
+  -webkit-font-smoothing:antialiased;
+  padding-bottom:calc(104px + env(safe-area-inset-bottom));
+}
+.wrap{max-width:520px;margin:0 auto;padding:0 16px}
+
+/* ── 헤더 ───────────────────────────────── */
+.hero{
+  background:radial-gradient(120% 140% at 15% 0%,#2f5bea 0%,#1d2a63 45%,#151b34 100%);
+  color:#fff; padding:calc(28px + env(safe-area-inset-top)) 0 44px; margin-bottom:-24px;
+}
+.hero .wrap{display:flex;flex-direction:column;gap:10px}
+.badge{
+  align-self:flex-start; font-size:12px; font-weight:600; letter-spacing:.02em;
+  background:rgba(255,255,255,.14); border:1px solid rgba(255,255,255,.18);
+  padding:5px 11px; border-radius:999px; backdrop-filter:blur(4px);
+}
+.hero h1{margin:0;font-size:27px;font-weight:800;letter-spacing:-.03em}
+.hero p{margin:0;font-size:14px;line-height:1.6;color:rgba(255,255,255,.72)}
+
+/* ── 섹션 ───────────────────────────────── */
+.card{
+  background:var(--card); border:1px solid var(--line); border-radius:var(--radius);
+  box-shadow:var(--shadow); padding:18px 16px; margin-bottom:14px;
+}
+.sec-head{display:flex;align-items:center;gap:9px;margin-bottom:14px}
+.step{
+  width:22px;height:22px;flex:none;border-radius:7px;background:var(--primary);color:var(--primary-ink);
+  font-size:12px;font-weight:700;display:grid;place-items:center;
+}
+.sec-head h2{margin:0;font-size:16px;font-weight:700;letter-spacing:-.02em}
+.sec-head .hint{margin-left:auto;font-size:12.5px;color:var(--muted);font-weight:500}
+
+/* ── 근무 지역 칩 ────────────────────────── */
+.chips{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+.chip{
+  appearance:none;border:1px solid var(--line);background:transparent;color:var(--fg);
+  font:inherit;font-size:14.5px;font-weight:600;letter-spacing:-.02em;
+  padding:13px 6px;border-radius:12px;cursor:pointer;transition:.15s;
+}
+.chip:hover{border-color:var(--primary-line)}
+.chip[aria-pressed="true"]{
+  background:var(--primary);border-color:var(--primary);color:var(--primary-ink);
+  box-shadow:0 4px 12px rgba(47,91,234,.28);
+}
+
+/* ── 품목 ───────────────────────────────── */
+.items{display:flex;flex-direction:column;gap:8px}
+.item{
+  display:flex;align-items:center;gap:12px;width:100%;
+  border:1px solid var(--line);background:transparent;color:var(--fg);font:inherit;
+  padding:13px 14px;border-radius:13px;cursor:pointer;text-align:left;transition:.15s;
+}
+.item:hover{border-color:var(--primary-line)}
+.item[aria-pressed="true"]{background:var(--primary-soft);border-color:var(--primary)}
+.item .ico{width:26px;height:26px;flex:none;color:var(--muted);transition:.15s}
+.item[aria-pressed="true"] .ico{color:var(--primary)}
+.item .name{flex:1;font-size:15.5px;font-weight:600;letter-spacing:-.02em}
+.tick{
+  width:22px;height:22px;flex:none;border:1.8px solid var(--line);border-radius:50%;
+  display:grid;place-items:center;transition:.15s;
+}
+.tick svg{width:13px;height:13px;color:#fff;opacity:0;transform:scale(.5);transition:.15s}
+.item[aria-pressed="true"] .tick{background:var(--primary);border-color:var(--primary)}
+.item[aria-pressed="true"] .tick svg{opacity:1;transform:scale(1)}
+
+/* 장갑 그룹 */
+.group{border:1px solid var(--line);border-radius:13px;padding:13px 14px;transition:.15s}
+.group.on{border-color:var(--primary);background:var(--primary-soft)}
+.group-top{display:flex;align-items:center;gap:12px;margin-bottom:11px}
+.group-top .ico{width:26px;height:26px;flex:none;color:var(--muted)}
+.group.on .group-top .ico{color:var(--primary)}
+.group-top .name{font-size:15.5px;font-weight:600;letter-spacing:-.02em}
+.group-top .sub{margin-left:auto;font-size:12.5px;color:var(--muted);font-weight:500}
+.sizes{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+.size{
+  appearance:none;border:1.5px solid var(--line);background:var(--card);color:var(--muted);
+  font:inherit;font-size:14px;font-weight:700;padding:10px 0;border-radius:10px;cursor:pointer;transition:.15s;
+}
+.size[aria-pressed="true"]{background:var(--primary);border-color:var(--primary);color:var(--primary-ink)}
+
+/* ── 하단 제출 바 ───────────────────────── */
+.bar{
+  position:fixed;left:0;right:0;bottom:0;z-index:20;
+  background:color-mix(in srgb,var(--bg) 82%,transparent);
+  backdrop-filter:blur(14px);border-top:1px solid var(--line);
+  padding:12px 0 calc(12px + env(safe-area-inset-bottom));
+}
+.bar .wrap{display:flex;align-items:center;gap:12px}
+.errwrap{max-width:520px;margin:0 auto;padding:0 16px}
+.err{display:none;margin-bottom:10px;padding:11px 13px;border-radius:11px;
+  background:#fde8e8;color:#9b1c1c;font-size:13.5px;font-weight:600;line-height:1.45}
+.err.show{display:block}
+@media (prefers-color-scheme:dark){ .err{background:#3a1b20;color:#fca5a5} }
+.summary{flex:1;min-width:0;font-size:13px;color:var(--muted);line-height:1.35}
+.summary b{display:block;color:var(--fg);font-size:14px;font-weight:700;
+  white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.submit{
+  flex:none;appearance:none;border:0;border-radius:13px;cursor:pointer;
+  background:var(--primary);color:var(--primary-ink);font:inherit;font-size:15.5px;font-weight:700;
+  padding:14px 26px;letter-spacing:-.02em;transition:.15s;
+  box-shadow:0 4px 14px rgba(47,91,234,.3);
+}
+.submit:disabled{background:var(--line);color:var(--muted);box-shadow:none;cursor:not-allowed}
+.submit:not(:disabled):active{transform:translateY(1px)}
+
+.foot{text-align:center;font-size:12.5px;color:var(--muted);padding:4px 0 8px}
+.foot a{color:var(--muted)}
+
+/* ── 완료 화면 ──────────────────────────── */
+.done{
+  position:fixed;inset:0;z-index:50;background:var(--bg);
+  display:none;place-items:center;padding:24px;
+}
+.done.show{display:grid;animation:fade .25s ease}
+@keyframes fade{from{opacity:0}to{opacity:1}}
+.done-inner{width:100%;max-width:400px;text-align:center}
+.check{
+  width:76px;height:76px;margin:0 auto 20px;border-radius:50%;background:var(--ok);
+  display:grid;place-items:center;animation:pop .4s cubic-bezier(.2,1.4,.4,1);
+}
+@keyframes pop{from{transform:scale(0)}to{transform:scale(1)}}
+.check svg{width:36px;height:36px;color:#fff}
+.done h2{margin:0 0 8px;font-size:23px;font-weight:800;letter-spacing:-.03em}
+.done>.done-inner>p{margin:0 0 22px;font-size:14.5px;color:var(--muted);line-height:1.6}
+.receipt{
+  background:var(--card);border:1px solid var(--line);border-radius:var(--radius);
+  padding:16px;text-align:left;margin-bottom:22px;box-shadow:var(--shadow);
+}
+.receipt .row{display:flex;gap:12px;padding:9px 0;font-size:14.5px}
+.receipt .row+.row{border-top:1px dashed var(--line)}
+.receipt .k{color:var(--muted);flex:none;width:70px;font-size:13.5px;padding-top:1px}
+.receipt .v{font-weight:600;letter-spacing:-.02em}
+.again{
+  width:100%;appearance:none;border:1px solid var(--line);background:var(--card);color:var(--fg);
+  font:inherit;font-size:15.5px;font-weight:700;padding:15px;border-radius:13px;cursor:pointer;
+}
+.spin{display:inline-block;width:15px;height:15px;border:2px solid currentColor;border-right-color:transparent;
+  border-radius:50%;animation:sp .7s linear infinite;vertical-align:-2px}
+@keyframes sp{to{transform:rotate(360deg)}}
+@media (max-width:360px){ .chips{grid-template-columns:repeat(2,1fr)} }
+</style>
+</head>
+<body>
+
+<header class="hero">
+  <div class="wrap">
+    <span class="badge">두드림원 · 비품 관리</span>
+    <h1>비품 신청</h1>
+    <p>1일 2번 바로 지급드리니 비품 너무 쌓아두지 마세요! 😄</p>
+  </div>
+</header>
+
+<main class="wrap">
+  <section class="card">
+    <div class="sec-head">
+      <span class="step">1</span><h2>근무 지역</h2>
+      <span class="hint">1곳 선택</span>
+    </div>
+    <div class="chips" id="regions"></div>
+  </section>
+
+  <section class="card">
+    <div class="sec-head">
+      <span class="step">2</span><h2>비품 요청 물품</h2>
+      <span class="hint">중복 선택</span>
+    </div>
+    <div class="items" id="items"></div>
+  </section>
+
+  <p class="foot">
+    문제가 있나요?
+    <a href="https://docs.google.com/forms/d/e/1FAIpQLSfLkfTdvTEFNwvyorEk_E9_OjeTUP9S45iHv5_K3BqzojfIKA/viewform" target="_blank" rel="noopener">기존 구글폼으로 신청하기</a>
+  </p>
+</main>
+
+<div class="bar">
+  <div class="errwrap">
+    <div class="err" id="error">전송에 실패했어요. 통신 상태를 확인하고 다시 시도해 주세요.</div>
+  </div>
+  <div class="wrap">
+    <div class="summary" id="summary"><b>근무 지역을 선택하세요</b>선택한 비품 0개</div>
+    <button class="submit" id="submit" disabled>신청하기</button>
+  </div>
+</div>
+
+<div class="done" id="done">
+  <div class="done-inner">
+    <div class="check"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 12.5l5.5 5.5L20 7"/></svg></div>
+    <h2>신청이 접수됐어요</h2>
+    <p>담당자에게 알림이 전송됐습니다.<br>지급까지 잠시만 기다려 주세요.</p>
+    <div class="receipt" id="receipt"></div>
+    <button class="again" id="again">새로 신청하기</button>
+  </div>
+</div>
+
+<script>
+(function () {
+  "use strict";
+
+  var ENDPOINT = "https://docs.google.com/forms/d/e/1FAIpQLSfLkfTdvTEFNwvyorEk_E9_OjeTUP9S45iHv5_K3BqzojfIKA/formResponse";
+  var ENTRY_REGION = "entry.1000057";
+  var ENTRY_ITEMS  = "entry.1000027";
+
+  // 인증 코드 — 이미 퍼진 구글폼 주소를 막기 위한 잠금장치.
+  // 구글폼에 "인증 코드" 질문(단답형·필수·정규식 일치)을 추가한 뒤 두 값을 채우면 켜진다.
+  // 하나라도 비어 있으면 코드를 보내지 않는다(= 지금까지와 동일하게 동작).
+  // 값을 바꿀 때는 반드시 verify.ps1로 검증할 것. 어긋나면 리더에게는
+  // 성공 화면이 뜨는데 시트에는 아무것도 안 쌓인다.
+  var ENTRY_CODE  = "";   // 예: "entry.123456789"
+  var ACCESS_CODE = "";   // 예: "Q3-912F36"
+
+  var REGIONS = ["서관 1","서관 2","동관 후문","동관 정문","동관 지하","신관 정문","신관 지하"];
+  // 구글폼 원본 순서 — 스프레드시트 셀 문자열을 기존과 동일하게 유지하기 위해 이 순서로 전송한다.
+  var ITEM_ORDER = ["페이퍼 타올","크리넬 티슈","장갑 S","장갑 M","장갑 L","키오스크 용지","손소독제(근무지용)"];
+
+  var ICONS = {
+    towel:'<ellipse cx="12" cy="6" rx="7" ry="3"/><path d="M5 6v12c0 1.66 3.13 3 7 3s7-1.34 7-3V6"/><ellipse cx="12" cy="6" rx="2.4" ry="1"/>',
+    tissue:'<rect x="3" y="11.5" width="18" height="8.5" rx="2"/><path d="M8 11.5l2-5.5 2 2.2 2-4.2 2 7.5"/>',
+    glove:'<path d="M8 21v-4.8l-1.9-2.4a1.8 1.8 0 0 1 2.7-2.3L10 12.6V5a1.5 1.5 0 0 1 3 0v5.5M13 10.5V4a1.5 1.5 0 0 1 3 0v6.5M16 10.5V7a1.5 1.5 0 0 1 3 0v8a6 6 0 0 1-6 6z"/>',
+    receipt:'<path d="M6 3h12v18l-2-1.4-2 1.4-2-1.4-2 1.4-2-1.4L6 21z"/><path d="M9.2 8.5h5.6M9.2 12.5h5.6"/>',
+    sanitizer:'<rect x="9" y="2" width="5" height="3.6" rx="1.2"/><path d="M14 3.4h2.8l-1.5 2.6"/><path d="M7.6 11a3.6 3.6 0 0 1 3.6-3.6h1.2A3.6 3.6 0 0 1 16 11v8.2a2.4 2.4 0 0 1-2.4 2.4h-3.6A2.4 2.4 0 0 1 7.6 19.2z"/>'
+  };
+  function svg(name, cls) {
+    return '<svg class="' + cls + '" viewBox="0 0 24 24" fill="none" stroke="currentColor" ' +
+           'stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">' + ICONS[name] + '</svg>';
+  }
+  var TICK = '<span class="tick"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.4" stroke-linecap="round" stroke-linejoin="round"><path d="M4.5 12.5l5 5L19.5 7"/></svg></span>';
+
+  var LAYOUT = [
+    { kind:"one",   value:"페이퍼 타올",        icon:"towel"     },
+    { kind:"one",   value:"크리넬 티슈",        icon:"tissue"    },
+    { kind:"glove", sizes:["장갑 S","장갑 M","장갑 L"], icon:"glove" },
+    { kind:"one",   value:"키오스크 용지",      icon:"receipt"   },
+    { kind:"one",   value:"손소독제(근무지용)", icon:"sanitizer" }
+  ];
+
+  var $ = function (id) { return document.getElementById(id); };
+  var region = null;
+  var picked = {};          // { "장갑 S": true, ... }
+  var sending = false;
+
+  /* ── 렌더 ──────────────────────────────── */
+  var regionBox = $("regions");
+  REGIONS.forEach(function (r) {
+    var b = document.createElement("button");
+    b.type = "button"; b.className = "chip"; b.textContent = r;
+    b.setAttribute("aria-pressed", "false");
+    b.onclick = function () { region = (region === r) ? null : r; paint(); };
+    b.dataset.region = r;
+    regionBox.appendChild(b);
+  });
+
+  var itemBox = $("items");
+  LAYOUT.forEach(function (row) {
+    if (row.kind === "one") {
+      var b = document.createElement("button");
+      b.type = "button"; b.className = "item"; b.dataset.value = row.value;
+      b.setAttribute("aria-pressed", "false");
+      b.innerHTML = svg(row.icon, "ico") + '<span class="name">' + row.value + "</span>" + TICK;
+      b.onclick = function () { toggle(row.value); };
+      itemBox.appendChild(b);
+    } else {
+      var g = document.createElement("div");
+      g.className = "group"; g.id = "glove-group";
+      var pills = row.sizes.map(function (s) {
+        return '<button type="button" class="size" data-value="' + s + '" aria-pressed="false">' +
+               s.replace("장갑 ", "") + "</button>";
+      }).join("");
+      g.innerHTML = '<div class="group-top">' + svg(row.icon, "ico") +
+        '<span class="name">장갑</span><span class="sub">사이즈 선택</span></div>' +
+        '<div class="sizes">' + pills + "</div>";
+      g.querySelectorAll(".size").forEach(function (p) {
+        p.onclick = function () { toggle(p.dataset.value); };
+      });
+      itemBox.appendChild(g);
+    }
+  });
+
+  function toggle(v) {
+    if (picked[v]) { delete picked[v]; } else { picked[v] = true; }
+    paint();
+  }
+
+  function chosen() {
+    return ITEM_ORDER.filter(function (v) { return picked[v]; });
+  }
+
+  /* ── 상태 반영 ─────────────────────────── */
+  function paint() {
+    regionBox.querySelectorAll(".chip").forEach(function (b) {
+      b.setAttribute("aria-pressed", String(b.dataset.region === region));
+    });
+    document.querySelectorAll(".item, .size").forEach(function (b) {
+      b.setAttribute("aria-pressed", String(!!picked[b.dataset.value]));
+    });
+    var gg = $("glove-group");
+    gg.classList.toggle("on", !!(picked["장갑 S"] || picked["장갑 M"] || picked["장갑 L"]));
+
+    var list = chosen();
+    $("summary").innerHTML = "<b>" + (region || "근무 지역을 선택하세요") + "</b>" +
+      (list.length ? "선택한 비품 " + list.length + "개" : "선택한 비품 0개");
+    $("submit").disabled = sending || !region || list.length === 0;
+    if (region) { try { localStorage.setItem("bipum:region", region); } catch (e) {} }
+  }
+
+  try {
+    var saved = localStorage.getItem("bipum:region");
+    if (saved && REGIONS.indexOf(saved) !== -1) { region = saved; }
+  } catch (e) {}
+  paint();
+
+  /* ── 전송: 구글폼 formResponse로 그대로 POST ──
+     no-cors라 응답 내용은 못 읽지만, 요청이 구글까지 닿았는지는
+     promise의 resolve/reject로 구분된다. 근무지 신호가 약할 때
+     "전송 실패인데 완료 화면"이 뜨는 것을 막기 위한 장치. */
+  $("submit").onclick = function () {
+    if (sending) { return; }
+    var list = chosen();
+    if (!region || !list.length) { return; }
+
+    sending = true;
+    var btn = $("submit");
+    btn.disabled = true;
+    btn.innerHTML = '<span class="spin"></span> 전송중';
+    $("error").classList.remove("show");
+
+    var body = new URLSearchParams();
+    body.append(ENTRY_REGION, region);
+    list.forEach(function (v) { body.append(ENTRY_ITEMS, v); });
+    if (ENTRY_CODE && ACCESS_CODE) { body.append(ENTRY_CODE, ACCESS_CODE); }
+
+    var ctl = new AbortController();
+    var giveUp = setTimeout(function () { ctl.abort(); }, 15000);
+
+    fetch(ENDPOINT, { method: "POST", mode: "no-cors", body: body, signal: ctl.signal })
+      .then(function () { clearTimeout(giveUp); succeed(region, list); })
+      .catch(function () { clearTimeout(giveUp); fail(); });
+  };
+
+  function fail() {
+    sending = false;
+    $("submit").textContent = "다시 시도";
+    $("error").classList.add("show");
+    paint();
+  }
+
+  function succeed(reg, list) {
+    var t = new Date();
+    var when = t.getFullYear() + "." + pad(t.getMonth() + 1) + "." + pad(t.getDate()) +
+               " " + pad(t.getHours()) + ":" + pad(t.getMinutes());
+    $("receipt").innerHTML =
+      '<div class="row"><span class="k">근무 지역</span><span class="v">' + esc(reg) + "</span></div>" +
+      '<div class="row"><span class="k">요청 물품</span><span class="v">' + list.map(esc).join("<br>") + "</span></div>" +
+      '<div class="row"><span class="k">신청 시각</span><span class="v">' + when + "</span></div>";
+    $("done").classList.add("show");
+  }
+  function pad(n) { return n < 10 ? "0" + n : "" + n; }
+  function esc(s) { return s.replace(/[&<>]/g, function (c) { return { "&":"&amp;", "<":"&lt;", ">":"&gt;" }[c]; }); }
+
+  $("again").onclick = function () {
+    picked = {};
+    sending = false;
+    $("submit").textContent = "신청하기";
+    $("done").classList.remove("show");
+    window.scrollTo(0, 0);
+    paint();
+  };
+})();
+</script>
+</body>
+</html>
