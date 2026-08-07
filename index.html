@@ -3,47 +3,60 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<meta name="theme-color" content="#151b34">
+<meta name="theme-color" content="#ede9f9">
 <title>주소가 변경되었습니다 · 비품 신청</title>
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700&display=swap">
 <style>
-:root{ --bg:#f2f4f8; --card:#fff; --fg:#141824; --muted:#707888; --line:#e5e8f0; }
-@media (prefers-color-scheme:dark){
-  :root{ --bg:#0d0f16; --card:#161a24; --fg:#eef0f6; --muted:#949cae; --line:#262c3a; }
-}
-*{box-sizing:border-box}
+/* 두드림원 직원 포털과 동일한 디자인 시스템 (포털 login.html 값 그대로). */
+*{box-sizing:border-box;margin:0;padding:0}
+html{height:100%}
 body{
-  margin:0; min-height:100vh; display:grid; place-items:center; padding:24px;
-  background:var(--bg); color:var(--fg);
-  font-family:"Pretendard Variable",Pretendard,-apple-system,BlinkMacSystemFont,"Apple SD Gothic Neo","Malgun Gothic",system-ui,sans-serif;
-  letter-spacing:-.01em; -webkit-font-smoothing:antialiased;
+  min-height:100%;
+  background:
+    radial-gradient(circle at 18% 20%, rgba(196,181,253,.55) 0%, transparent 42%),
+    radial-gradient(circle at 84% 24%, rgba(251,207,232,.50) 0%, transparent 42%),
+    radial-gradient(circle at 50% 92%, rgba(186,230,253,.50) 0%, transparent 45%),
+    linear-gradient(160deg,#f5f5fd 0%,#ede9f9 100%);
+  font-family:'Noto Sans KR',-apple-system,BlinkMacSystemFont,"Apple SD Gothic Neo","Malgun Gothic",sans-serif;
+  color:#2d3748;
+  display:flex;align-items:center;justify-content:center;padding:20px;
+  -webkit-font-smoothing:antialiased;
 }
 .box{
-  max-width:400px; width:100%; text-align:center;
-  background:var(--card); border:1px solid var(--line); border-radius:18px;
-  padding:36px 26px; box-shadow:0 1px 2px rgba(20,24,36,.05), 0 8px 24px rgba(20,24,36,.06);
+  background:rgba(255,255,255,.50);
+  backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);
+  border:1px solid rgba(255,255,255,.70);
+  border-radius:24px;
+  padding:44px 32px;
+  width:100%;max-width:420px;
+  box-shadow:0 12px 40px rgba(120,100,180,.18);
+  text-align:center;
 }
 .mark{
-  width:64px; height:64px; margin:0 auto 20px; border-radius:50%;
-  background:radial-gradient(120% 140% at 20% 0%,#2f5bea,#1d2a63);
-  display:grid; place-items:center; color:#fff;
+  width:64px;height:64px;margin:0 auto 22px;border-radius:50%;
+  background:linear-gradient(135deg,#8b7ff0 0%,#c780d8 100%);
+  display:grid;place-items:center;color:#fff;
+  box-shadow:0 8px 24px rgba(139,127,240,.35);
 }
-.mark svg{width:30px;height:30px}
-h1{margin:0 0 10px; font-size:20px; font-weight:800; letter-spacing:-.03em}
-p{margin:0; font-size:14.5px; line-height:1.65; color:var(--muted)}
+.mark svg{width:29px;height:29px}
+h1{font-size:20px;font-weight:700;margin-bottom:6px}
+.company{font-size:14px;color:#718096;margin-bottom:20px}
+p{font-size:14.5px;line-height:1.7;color:#718096}
 </style>
 </head>
 <body>
   <div class="box">
     <div class="mark">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round">
         <rect x="4" y="10.5" width="16" height="10.5" rx="2.5"/>
         <path d="M8 10.5V7a4 4 0 0 1 8 0v3.5"/>
       </svg>
     </div>
     <h1>주소가 변경되었습니다</h1>
-    <p>비품 신청 페이지 주소는 리더 교체 시점마다 새로 발급됩니다.<br>
-       비품 관리자에게 현재 주소를 문의해 주세요.</p>
+    <div class="company">(주) 두드림원</div>
+    <p>비품 신청 페이지 주소는 리더 교체 시점마다<br>새로 발급됩니다.<br>부소장에게 현재 주소를 문의해 주세요.</p>
   </div>
 </body>
 </html>
