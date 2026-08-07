@@ -45,6 +45,14 @@ body{
 }
 .hero h1{margin:0;font-size:27px;font-weight:800;letter-spacing:-.03em}
 .hero p{margin:0;font-size:14px;line-height:1.6;color:rgba(255,255,255,.72)}
+.site{
+  display:flex;align-items:center;gap:7px;align-self:flex-start;margin-top:4px;
+  padding:9px 14px;border-radius:12px;
+  background:rgba(255,255,255,.13);border:1px solid rgba(255,255,255,.22);
+  font-size:16px;font-weight:700;letter-spacing:-.02em;
+}
+.site svg{width:17px;height:17px;flex:none;opacity:.85}
+.site[hidden]{display:none}
 
 /* ── 섹션 ───────────────────────────────── */
 .card{
@@ -56,6 +64,8 @@ body{
   width:22px;height:22px;flex:none;border-radius:7px;background:var(--primary);color:var(--primary-ink);
   font-size:12px;font-weight:700;display:grid;place-items:center;
 }
+.step[hidden]{display:none}
+.card[hidden]{display:none}
 .sec-head h2{margin:0;font-size:16px;font-weight:700;letter-spacing:-.02em}
 .sec-head .hint{margin-left:auto;font-size:12.5px;color:var(--muted);font-weight:500}
 
@@ -176,11 +186,17 @@ body{
     <span class="badge">두드림원 · 비품 관리</span>
     <h1>비품 신청</h1>
     <p>1일 2번 바로 지급드리니 비품 너무 쌓아두지 마세요! 😄</p>
+    <div class="site" id="site" hidden>
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M12 21s7-5.6 7-11a7 7 0 1 0-14 0c0 5.4 7 11 7 11z"/><circle cx="12" cy="10" r="2.6"/>
+      </svg>
+      <span id="siteName"></span>
+    </div>
   </div>
 </header>
 
 <main class="wrap">
-  <section class="card">
+  <section class="card" id="regionCard">
     <div class="sec-head">
       <span class="step">1</span><h2>근무 지역</h2>
       <span class="hint">1곳 선택</span>
@@ -190,7 +206,7 @@ body{
 
   <section class="card">
     <div class="sec-head">
-      <span class="step">2</span><h2>비품 요청 물품</h2>
+      <span class="step" id="itemStep">2</span><h2>비품 요청 물품</h2>
       <span class="hint">중복 선택</span>
     </div>
     <div class="items" id="items"></div>
@@ -235,10 +251,23 @@ body{
   // 하나라도 비어 있으면 코드를 보내지 않는다(= 지금까지와 동일하게 동작).
   // 값을 바꿀 때는 반드시 verify.ps1로 검증할 것. 어긋나면 리더에게는
   // 성공 화면이 뜨는데 시트에는 아무것도 안 쌓인다.
-  var ENTRY_CODE  = "";   // 예: "entry.123456789"
-  var ACCESS_CODE = "";   // 예: "Q3-912F36"
+  var ENTRY_CODE  = "entry.521168683";
+  var ACCESS_CODE = "Q3-912F36";
 
   var REGIONS = ["서관 1","서관 2","동관 후문","동관 정문","동관 지하","신관 정문","신관 지하"];
+
+  // 근무지별 링크 — 주소 뒤에 ?w=코드 를 붙이면 그 근무지 전용 화면이 된다.
+  // 값이 1곳이면 근무 지역 선택 단계가 아예 사라지고 헤더에 근무지가 고정 표시된다.
+  // 값이 여러 곳이면 그 목록만 고르게 한다(정문 2곳은 리더가 같아 하나로 묶었다).
+  // ?w 가 없거나 모르는 코드면 7곳 전부 보여준다(관리자용·폴백).
+  var SITES = {
+    "seo1":     ["서관 1"],
+    "seo2":     ["서관 2"],
+    "dong-h":   ["동관 후문"],
+    "dong-b":   ["동관 지하"],
+    "sin-b":    ["신관 지하"],
+    "jeongmun": ["동관 정문", "신관 정문"]
+  };
   // 구글폼 원본 순서 — 스프레드시트 셀 문자열을 기존과 동일하게 유지하기 위해 이 순서로 전송한다.
   var ITEM_ORDER = ["페이퍼 타올","크리넬 티슈","장갑 S","장갑 M","장갑 L","키오스크 용지","손소독제(근무지용)"];
 
@@ -268,16 +297,35 @@ body{
   var picked = {};          // { "장갑 S": true, ... }
   var sending = false;
 
+  // 이 링크가 담당하는 근무지
+  var slug = new URLSearchParams(location.search).get("w");
+  var ALLOWED = (slug && SITES[slug]) ? SITES[slug] : REGIONS;
+  var LOCKED = ALLOWED.length === 1;
+
   /* ── 렌더 ──────────────────────────────── */
   var regionBox = $("regions");
-  REGIONS.forEach(function (r) {
-    var b = document.createElement("button");
-    b.type = "button"; b.className = "chip"; b.textContent = r;
-    b.setAttribute("aria-pressed", "false");
-    b.onclick = function () { region = (region === r) ? null : r; paint(); };
-    b.dataset.region = r;
-    regionBox.appendChild(b);
-  });
+  if (LOCKED) {
+    // 근무지가 하나뿐이면 고르게 하지 않는다. 대신 헤더에 못박아 보여줘서
+    // 리더가 "내 근무지로 나가는 게 맞나"를 한눈에 확인할 수 있게 한다.
+    region = ALLOWED[0];
+    $("siteName").textContent = region;
+    $("site").hidden = false;
+    $("regionCard").hidden = true;
+    $("itemStep").hidden = true;
+    document.title = region + " 비품 신청 · 두드림원";
+  } else {
+    if (ALLOWED.length < 3) {
+      regionBox.style.gridTemplateColumns = "repeat(" + ALLOWED.length + ",1fr)";
+    }
+    ALLOWED.forEach(function (r) {
+      var b = document.createElement("button");
+      b.type = "button"; b.className = "chip"; b.textContent = r;
+      b.setAttribute("aria-pressed", "false");
+      b.onclick = function () { region = (region === r) ? null : r; paint(); };
+      b.dataset.region = r;
+      regionBox.appendChild(b);
+    });
+  }
 
   var itemBox = $("items");
   LAYOUT.forEach(function (row) {
@@ -329,13 +377,16 @@ body{
     $("summary").innerHTML = "<b>" + (region || "근무 지역을 선택하세요") + "</b>" +
       (list.length ? "선택한 비품 " + list.length + "개" : "선택한 비품 0개");
     $("submit").disabled = sending || !region || list.length === 0;
-    if (region) { try { localStorage.setItem("bipum:region", region); } catch (e) {} }
+    // 고정 링크는 기억할 것이 없다. 관리자용 화면의 기억을 덮어쓰지 않도록 건너뛴다.
+    if (region && !LOCKED) { try { localStorage.setItem("bipum:region", region); } catch (e) {} }
   }
 
-  try {
-    var saved = localStorage.getItem("bipum:region");
-    if (saved && REGIONS.indexOf(saved) !== -1) { region = saved; }
-  } catch (e) {}
+  if (!LOCKED) {
+    try {
+      var saved = localStorage.getItem("bipum:region");
+      if (saved && ALLOWED.indexOf(saved) !== -1) { region = saved; }
+    } catch (e) {}
+  }
   paint();
 
   /* ── 전송: 구글폼 formResponse로 그대로 POST ──
