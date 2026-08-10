@@ -151,6 +151,25 @@ body{
 
 .foot{text-align:center;font-size:12.5px;color:var(--muted);padding:4px 0 8px}
 
+/* ── 폐기된 링크 화면 ───────────────────── */
+.gone{position:fixed;inset:0;z-index:60;background:var(--page-bg);display:grid;place-items:center;padding:24px}
+.gone[hidden]{display:none}
+.gone .box{
+  width:100%;max-width:400px;text-align:center;
+  background:rgba(255,255,255,.50);
+  backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);
+  border:1px solid rgba(255,255,255,.70);border-radius:24px;
+  padding:44px 32px;box-shadow:0 12px 40px rgba(120,100,180,.18);
+}
+.gone .mark{
+  width:64px;height:64px;margin:0 auto 22px;border-radius:50%;background:var(--grad);
+  display:grid;place-items:center;color:#fff;box-shadow:0 8px 24px rgba(139,127,240,.35);
+}
+.gone .mark svg{width:29px;height:29px}
+.gone h2{margin:0 0 6px;font-size:20px;font-weight:700;color:var(--ink)}
+.gone .company{font-size:14px;color:var(--muted);margin-bottom:20px}
+.gone p{margin:0;font-size:14.5px;line-height:1.7;color:var(--muted)}
+
 /* ── 완료 화면 ──────────────────────────── */
 .done{
   position:fixed;inset:0;z-index:50;background:var(--page-bg);
@@ -235,6 +254,22 @@ body{
   </div>
 </div>
 
+<!-- 폐기된 ?w 값으로 들어온 경우. 예전 정문 묶음 링크처럼 없앤 주소가
+     폴백을 타고 계속 살아 있는 것을 막는다. -->
+<div class="gone" id="gone" hidden>
+  <div class="box">
+    <div class="mark">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round">
+        <rect x="4" y="10.5" width="16" height="10.5" rx="2.5"/>
+        <path d="M8 10.5V7a4 4 0 0 1 8 0v3.5"/>
+      </svg>
+    </div>
+    <h2>더 이상 사용하지 않는 주소입니다</h2>
+    <div class="company">(주) 두드림원</div>
+    <p>부소장에게 현재 주소를 문의해 주세요.</p>
+  </div>
+</div>
+
 <div class="done" id="done">
   <div class="done-inner">
     <div class="check"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 12.5l5.5 5.5L20 7"/></svg></div>
@@ -308,7 +343,17 @@ body{
 
   // 이 링크가 담당하는 근무지
   var slug = new URLSearchParams(location.search).get("w");
-  var ALLOWED = (slug && SITES[slug]) ? SITES[slug] : REGIONS;
+
+  // ?w 가 아예 없으면 고정 주소(manage-*, staff-*)로 들어온 것이라 7곳을 보여준다.
+  // ?w 가 있는데 목록에 없으면 폐기된 링크다. 조용히 7곳으로 넘기면 없앤 주소가
+  // 계속 살아 있는 셈이 되므로 여기서 끊는다.
+  if (slug !== null && !SITES[slug]) {
+    $("gone").hidden = false;
+    document.title = "사용하지 않는 주소 · 비품 신청";
+    return;
+  }
+
+  var ALLOWED = slug ? SITES[slug] : REGIONS;
   var LOCKED = ALLOWED.length === 1;
 
   /* ── 렌더 ──────────────────────────────── */
