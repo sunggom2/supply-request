@@ -44,10 +44,16 @@ if ($NewSlot -notmatch '^\d{4}-\dq-[0-9a-f]{6}$') { Fail "이름 형식이 맞�
 if ($NewSlot -eq $old) { Fail "새 이름이 현재 이름과 같습니다." }
 if (Test-Path -LiteralPath (Join-Path $root $NewSlot)) { Fail "이미 있는 폴더입니다: $NewSlot" }
 
-$admin = Get-ChildItem -Path $root -Directory | Where-Object { $_.Name -match '^manage-' }
-if ($admin.Count -ne 1) { Fail "관리자 폴더(manage-*)를 찾지 못했습니다." }
-$adminName = $admin[0].Name
-$adminPage = Join-Path $admin[0].FullName 'index.html'
+# 슬롯 밖에서 현재 슬롯을 가리키고 있는 고정 주소 페이지들(manage-*, staff-* …).
+# 폴더 이름을 하드코딩하지 않고 내용으로 찾는다.
+$stubs = Get-ChildItem -Path $root -Directory |
+  Where-Object { $_.Name -ne $old } |
+  ForEach-Object { Join-Path $_.FullName 'index.html' } |
+  Where-Object { Test-Path -LiteralPath $_ } |
+  Get-Item |
+  Where-Object { [System.IO.File]::ReadAllText($_.FullName, [System.Text.Encoding]::UTF8) -match '\.\./\d{4}-\dq-[0-9a-f]+/' }
+
+if ($stubs.Count -lt 1) { Fail "고정 주소 페이지를 하나도 찾지 못했습니다." }
 
 Write-Host ""
 Write-Host "  $old  →  $NewSlot"
@@ -58,19 +64,25 @@ Write-Host ""
 if ($LASTEXITCODE -ne 0) { Fail "폴더 이름 변경에 실패했습니다." }
 Write-Host "  [1/5] 슬롯 폴더 이름 변경" -ForegroundColor Green
 
-# ── 2. 관리자 stub 갱신 ───────────────────────────
-$html = [System.IO.File]::ReadAllText($adminPage, [System.Text.Encoding]::UTF8)
-$updated = [regex]::Replace($html, '\.\./\d{4}-\dq-[0-9a-f]+/', "../$NewSlot/")
-if ($updated -eq $html) { Fail "관리자 stub에서 슬롯 경로를 찾지 못했습니다: $adminPage" }
-[System.IO.File]::WriteAllText($adminPage, $updated, (New-Object System.Text.UTF8Encoding($false)))
-Write-Host "  [2/5] 관리자 고정 주소가 새 슬롯을 가리키도록 갱신" -ForegroundColor Green
+# ── 2. 고정 주소 stub 전부 갱신 ───────────────────
+# 폴더 이름으로 찾지 않고 "슬롯 경로를 담고 있는 index.html"을 전부 찾는다.
+# 나중에 고정 주소가 하나 더 늘어도 이 스크립트를 고칠 필요가 없다.
+$done = @()
+foreach ($p in $stubs) {
+  $html = [System.IO.File]::ReadAllText($p.FullName, [System.Text.Encoding]::UTF8)
+  $updated = [regex]::Replace($html, '\.\./\d{4}-\dq-[0-9a-f]+/', "../$NewSlot/")
+  if ($updated -eq $html) { Fail "stub에서 슬롯 경로를 찾지 못했습니다: $($p.FullName)" }
+  [System.IO.File]::WriteAllText($p.FullName, $updated, (New-Object System.Text.UTF8Encoding($false)))
+  $done += $p.Directory.Name
+}
+Write-Host "  [2/5] 고정 주소 갱신 ($($done -join ', '))" -ForegroundColor Green
 
 if ($NoPush) {
   Write-Host ""
   Write-Host "  -NoPush 지정: 커밋/업로드를 건너뜁니다." -ForegroundColor Yellow
   Write-Host "  되돌리려면:  git -C `"$root`" reset --hard" -ForegroundColor Yellow
   Write-Host "  되돌린 뒤 빈 폴더 $NewSlot 이 남으니 같이 지우세요." -ForegroundColor Yellow
-  Write-Host "  관리자 stub 도 손으로 되돌려야 합니다(추적 대상이 아니라 reset 이 안 건드립니다)." -ForegroundColor Yellow
+  Write-Host "  고정 주소 페이지들도 확인하세요 — reset 은 커밋된 내용까지만 되돌립니다." -ForegroundColor Yellow
   Write-Host ""
   exit 0
 }
@@ -110,8 +122,5 @@ if (-not $ok) {
 
 # ── 5. 새 링크 출력 ───────────────────────────────
 Write-Host ""
+# links.ps1 이 고정 주소까지 함께 출력하므로 여기서 따로 찍지 않는다.
 & (Join-Path $root 'links.ps1') -User $User -Repo $Repo
-
-Write-Host "  관리자 고정 주소 (안 바뀜, 북마크해 두세요)"
-Write-Host "    $base$adminName/"
-Write-Host ""

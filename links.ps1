@@ -54,18 +54,23 @@ $rows = @()
 foreach ($m in [regex]::Matches($block, '"([a-z0-9\-]+)"\s*:\s*\[([^\]]*)\]')) {
   $slug = $m.Groups[1].Value
   $names = [regex]::Matches($m.Groups[2].Value, '"([^"]+)"') | ForEach-Object { $_.Groups[1].Value }
-  # all 은 7곳 전부라 이름을 그대로 이으면 줄이 너무 길어진다.
-  $label = if ($slug -eq 'all') { '전 근무지 (교체 시 만료)' } else { ($names -join ' / ') }
-  $rows += [pscustomobject]@{ 근무지 = $label; 링크 = ($base + '?w=' + $slug) }
+  $rows += [pscustomobject]@{ 근무지 = ($names -join ' / '); 링크 = ($base + '?w=' + $slug) }
 }
 
-# 관리자 주소는 슬롯 밖에 있어 주소를 교체해도 그대로 살아 있다.
-# 그래서 회수가 불가능하다 — 남에게 주지 말고 ?w=all 을 줄 것.
-$admin = Get-ChildItem -Path $root -Directory | Where-Object { $_.Name -match '^manage-' }
-if ($admin.Count -eq 1) {
-  $rows += [pscustomobject]@{
-    근무지 = '관리자 (고정 · 공유 금지)'
-    링크   = "https://$User.github.io/$Repo/$($admin[0].Name)/"
+# 슬롯 밖 고정 주소 — 주소를 교체해도 그대로 살아 있다.
+# staff-* 는 담당자가 바뀌지 않는 직원용, manage-* 는 부소장 본인용이다.
+# 둘을 따로 둔 이유: 직원 하나만 차단할 때 그 폴더만 지우면 되기 때문이다.
+$fixed = @(
+  @{ prefix = 'staff-';  label = '전 근무지 (고정 · 담당 직원)' },
+  @{ prefix = 'manage-'; label = '관리자 (고정 · 공유 금지)' }
+)
+foreach ($f in $fixed) {
+  $dir = @(Get-ChildItem -Path $root -Directory | Where-Object { $_.Name -like ($f.prefix + '*') })
+  if ($dir.Count -eq 1) {
+    $rows += [pscustomobject]@{
+      근무지 = $f.label
+      링크   = "https://$User.github.io/$Repo/$($dir[0].Name)/"
+    }
   }
 }
 
