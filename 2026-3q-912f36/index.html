@@ -46,6 +46,7 @@ body{
 .head h1{margin:0 0 4px;font-size:26px;font-weight:700;color:var(--ink)}
 .head .sub{font-size:14px;color:var(--muted);font-weight:400}
 .head .note{margin:14px 0 0;font-size:13.5px;color:var(--muted);line-height:1.6}
+.head .note[hidden]{display:none}
 .site{
   display:inline-flex;align-items:center;gap:8px;margin-top:16px;
   padding:11px 18px;border-radius:999px;
@@ -218,7 +219,8 @@ body{
       </svg>
       <span id="siteName"></span>
     </div>
-    <p class="note">비품 너무 쌓아두지 마세요! 😄</p>
+    <!-- 리더용 문구가 기본값. 관리자·비서 화면은 스크립트가 바꾸거나 숨긴다. -->
+    <p class="note" id="note">비품 너무 쌓아두지 마세요! 😄</p>
   </div>
 </header>
 
@@ -362,6 +364,18 @@ body{
   // 고정 주소(manage-*, staff-*)는 ?w 없이 들어온다. 전 근무지용 품목은
   // 그 화면에서만 보여준다.
   var FULL = (slug === null);
+
+  // 관리자와 비서는 둘 다 ?w 없이 같은 화면으로 들어오므로 ?w 로는 구분되지 않는다.
+  // 그래서 고정 주소 stub 이 ?v 로 자기가 누구인지 알려준다.
+  //   ?v=admin  관리자   안내 문구 없음
+  //   ?v=sec    비서
+  //   그 외     근무지 리더 (기본 문구, HTML 에 그대로 적혀 있다)
+  var VIEWER = new URLSearchParams(location.search).get("v");
+  if (VIEWER === "admin") {
+    $("note").hidden = true;
+  } else if (VIEWER === "sec") {
+    $("note").textContent = "비품 관리 정확히 하도록";
+  }
 
   /* ── 렌더 ──────────────────────────────── */
   var regionBox = $("regions");
