@@ -371,10 +371,13 @@ body{
   //   ?v=sec    비서
   //   그 외     근무지 리더 (기본 문구, HTML 에 그대로 적혀 있다)
   var VIEWER = new URLSearchParams(location.search).get("v");
-  if (VIEWER === "admin") {
-    $("note").hidden = true;
-  } else if (VIEWER === "sec") {
+  if (VIEWER === "sec") {
     $("note").textContent = "비품 관리 정확히 하도록";
+  } else if (FULL) {
+    // 관리자 화면. ?v=admin 으로 오든 슬롯 주소로 바로 오든, 7곳이 다 보이는
+    // 화면이면 리더용 문구는 띄우지 않는다. ?v 유무로 갈리면 같은 화면인데
+    // 문구만 다른 상태가 되어 헷갈린다.
+    $("note").hidden = true;
   }
 
   /* ── 렌더 ──────────────────────────────── */
