@@ -58,10 +58,10 @@ foreach ($m in [regex]::Matches($block, '"([a-z0-9\-]+)"\s*:\s*\[([^\]]*)\]')) {
 }
 
 # 슬롯 밖 고정 주소 — 주소를 교체해도 그대로 살아 있다.
-# staff-* 는 담당자가 바뀌지 않는 직원용, manage-* 는 부소장 본인용이다.
-# 둘을 따로 둔 이유: 직원 하나만 차단할 때 그 폴더만 지우면 되기 때문이다.
+# staff-* 는 비서용, manage-* 는 부소장 본인용이다.
+# 둘을 따로 둔 이유: 한쪽만 차단할 때 그 폴더만 지우면 되기 때문이다.
 $fixed = @(
-  @{ prefix = 'staff-';  label = '전 근무지 (고정 · 담당 직원)' },
+  @{ prefix = 'staff-';  label = '비서 (고정 · 7곳 전부)' },
   @{ prefix = 'manage-'; label = '관리자 (고정 · 공유 금지)' }
 )
 foreach ($f in $fixed) {
