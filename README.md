@@ -21,7 +21,7 @@ supply-request/
 ├── verify.ps1              인증 코드 검증 스크립트
 ├── manage-9f1dee/
 │   └── index.html          관리자 고정 주소 → 현재 슬롯으로 이동
-└── 2026-3q-912f36/
+└── 2026-3q-c03fcc/
     └── index.html          실제 신청 페이지 (슬롯)
 ```
 
